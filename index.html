@@ -653,13 +653,13 @@ const DEFAULT_PROJECTS = [
     badges: [{l:'Phase 2 ✅',c:'green'},{l:'Firebase Blaze',c:'orange'},{l:'SODIA',c:'purple'}],
     description: "Gestion des formations annuelles Clinifutur (3 centres : DELPRA · OASIS · CJA). Kanban mensuel 3 colonnes, workflow d'inscription unifié (DEMANDE → INSCRIT + convocation PDF auto), suivi admin 11 statuts, exports CSV, 3 Cloud Functions planifiées.",
     meta: [
-      ['Project ID','formasodia-clinifutur'],
-      ['Stack','Firebase Hosting + Firestore (asia-south1 Mumbai) + Functions (europe-west1) + Resend + jsPDF'],
-      ['Charte','Éditorial médical raffiné — Fraunces + Geist, violet SODIA #B088D9'],
-      ['Collections','7 : centres, utilisateurs, formations, sessions, stagiaires, inscriptions, suivi'],
-      ['Functions','rappelJ2 (8h) · attestationEvalChaud (9h) · evalFroid J+60 (10h)'],
-      ['Coût','0 € (Blaze sous seuils · Resend 3000/mois gratuit)'],
-      ['Phase','2 OK — 2bis (KPIs Analyses RH) à lancer']
+      {k:'Project ID',v:'formasodia-clinifutur'},
+      {k:'Stack',v:'Firebase Hosting + Firestore (asia-south1 Mumbai) + Functions (europe-west1) + Resend + jsPDF'},
+      {k:'Charte',v:'Éditorial médical raffiné — Fraunces + Geist, violet SODIA #B088D9'},
+      {k:'Collections',v:'7 : centres, utilisateurs, formations, sessions, stagiaires, inscriptions, suivi'},
+      {k:'Functions',v:'rappelJ2 (8h) · attestationEvalChaud (9h) · evalFroid J+60 (10h)'},
+      {k:'Coût',v:'0 € (Blaze sous seuils · Resend 3000/mois gratuit)'},
+      {k:'Phase',v:'2 OK — 2bis (KPIs Analyses RH) à lancer'}
     ],
     prochaineAction: "Lancer Phase 2bis — KPIs Analyses RH (absentéisme, remplissage, retour éval froid) · relancer DSI pour domaine expéditeur propre",
     keywords: "formadia firebase clinifutur sodia formations delpra oasis cja cloud functions resend mumbai blaze"
@@ -670,11 +670,11 @@ const DEFAULT_PROJECTS = [
     badges: [{l:'Production',c:'green'},{l:'Privé',c:'gray'},{l:'Firebase',c:'blue'}],
     description: "Outil interne de planification des séances de rhéophérèse pour le service de néphrologie. Gestion patients, cycles de soins, plannings, kits, personnel IDE. Évolution +87,5% séances.",
     meta: [
-      ['Architecture','SPA monofichier — tout dans public/index.html (~4000 lignes, ES modules CDN, zéro build)'],
-      ['Stack','Firebase Hosting + Firestore + Auth (Google @clinifutur.net + whitelist) + Storage + Chart.js'],
-      ['Collections','7 : sessions, patients, cycles, kits, ide, agents, utilisateurs'],
-      ['Usage','Interne DELPRA — quotidien par le service'],
-      ['⚠ Sensible','doSilentSync() rate-limité 60s — ne JAMAIS ajouter de timer Firestore sans lui (pic 60k reads 15/04)']
+      {k:'Architecture',v:'SPA monofichier — tout dans public/index.html (~4000 lignes, ES modules CDN, zéro build)'},
+      {k:'Stack',v:'Firebase Hosting + Firestore + Auth (Google @clinifutur.net + whitelist) + Storage + Chart.js'},
+      {k:'Collections',v:'7 : sessions, patients, cycles, kits, ide, agents, utilisateurs'},
+      {k:'Usage',v:'Interne DELPRA — quotidien par le service'},
+      {k:'⚠ Sensible',v:'doSilentSync() rate-limité 60s — ne JAMAIS ajouter de timer Firestore sans lui (pic 60k reads 15/04)'}
     ],
     prochaineAction: "Surveiller la conso Firestore mensuelle · tester en local avant tout déploiement (app en prod quotidienne)",
     keywords: "rheoplan rheopherese nephrologie delpra planification seances firestore chartjs patients cycles kits ide"
@@ -687,14 +687,14 @@ const DEFAULT_PROJECTS = [
     badges: [{l:'Lancement',c:'red'},{l:'TikTok',c:'gray'},{l:'Daily 18h',c:'orange'}],
     description: "Chaque jour, une date de l'Histoire devient une mini-énigme visuelle en 7 slides : hook → set-up → indice → révélation → chiffres → bonus insolite → CTA + teasing. Positionnement entre @minutehistoire et The Pudding.",
     meta: [
-      ['Format','Carrousel 9:16 · 1080×1920 · 7 slides (non négociable)'],
-      ['Stack','React 18.3.1 UMD + Babel standalone (zéro build, HTML autonome)'],
-      ['Typos','Fraunces + Space Grotesk + Caveat'],
-      ['Signature','#E85D5D — UNIQUEMENT sur LE mot-clé pivot'],
-      ['Palettes','7 rotations : Sky · Rose · Sage · Sun · Terracotta · Lavande · Mint'],
-      ['KPIs algo','1. Completion ≥60% · 2. Saves ≥5% · 3. Reverse swipes (slide 3 → slide 5)'],
-      ['Objectifs An 1','5-10k abonnés · 365 jours sans rupture'],
-      ['Risque n°1','Ne pas lancer la newsletter dès mois 4-6 → 100% dépendant de TikTok']
+      {k:'Format',v:'Carrousel 9:16 · 1080×1920 · 7 slides (non négociable)'},
+      {k:'Stack',v:'React 18.3.1 UMD + Babel standalone (zéro build, HTML autonome)'},
+      {k:'Typos',v:'Fraunces + Space Grotesk + Caveat'},
+      {k:'Signature',v:'#E85D5D — UNIQUEMENT sur LE mot-clé pivot'},
+      {k:'Palettes',v:'7 rotations : Sky · Rose · Sage · Sun · Terracotta · Lavande · Mint'},
+      {k:'KPIs algo',v:'1. Completion ≥60% · 2. Saves ≥5% · 3. Reverse swipes (slide 3 → slide 5)'},
+      {k:'Objectifs An 1',v:'5-10k abonnés · 365 jours sans rupture'},
+      {k:'Risque n°1',v:'Ne pas lancer la newsletter dès mois 4-6 → 100% dépendant de TikTok'}
     ],
     prochaineAction: "Tenir la chaîne des 90 jours · produire 14 jours d'avance · préparer le lancement newsletter dès mois 4",
     keywords: "flashconnaissances tiktok ephemeride slides daily editorial rouge palette fraunces reverse swipe saves"
@@ -705,7 +705,7 @@ const DEFAULT_PROJECTS = [
     url: 'https://script.google.com',
     badges: [{l:'Actif',c:'green'},{l:'Apps Script',c:'purple'}],
     description: "PDF + Gmail le 3 de chaque mois à 8h. Studio Sainte-Clotilde.",
-    meta: [['Token','Non'],['Coût','Gratuit']],
+    meta: [{k:'Token',v:'Non'},{k:'Coût',v:'Gratuit'}],
     prochaineAction: "Vérifier que l'envoi du 3 du mois passe bien",
     keywords: "quittance sandrine mezzacasa loyer pdf gmail apps script sainte-clotilde"
   },
@@ -714,7 +714,7 @@ const DEFAULT_PROJECTS = [
     url: 'https://script.google.com',
     badges: [{l:'Actif',c:'green'},{l:'Apps Script',c:'purple'}],
     description: "Mail aux équipes. 2ᵉ mardi 7h et 18h, 2ᵉ mercredi 7h.",
-    meta: [['Token','Non'],['Coût','Gratuit']],
+    meta: [{k:'Token',v:'Non'},{k:'Coût',v:'Gratuit'}],
     prochaineAction: "RAS — laisser tourner",
     keywords: "alerte fiches transfert mardi mercredi equipes apps script mail rappel"
   },
@@ -723,7 +723,7 @@ const DEFAULT_PROJECTS = [
     url: 'https://github.com/Ridolf974/daily-news-report',
     badges: [{l:'Actif',c:'green'},{l:'GitHub',c:'blue'},{l:'Tokens',c:'red'}],
     description: "30 actus chaque matin 8h. API Claude + web search.",
-    meta: [['Coût','~0,02 $/jour'],['Secrets','API Anthropic, Gmail app password']],
+    meta: [{k:'Coût',v:'~0,02 $/jour'},{k:'Secrets',v:'API Anthropic, Gmail app password'}],
     prochaineAction: "Surveiller la consommation de tokens mensuelle",
     keywords: "daily news report github actions claude api anthropic web search tokens"
   },
@@ -732,7 +732,7 @@ const DEFAULT_PROJECTS = [
     url: '',
     badges: [{l:'Déployé',c:'green'},{l:'Clinifutur',c:'gray'}],
     description: "Outil groupe (pas votre dev). DELPRA site pilote depuis juin 2025.",
-    meta: [['Votre rôle','Pilote / supervision']],
+    meta: [{k:'Votre rôle',v:'Pilote / supervision'}],
     prochaineAction: "Remonter retours d'usage pour déploiement autres centres",
     keywords: "gmao delpra clinifutur outil groupe site pilote maintenance"
   },
@@ -765,11 +765,11 @@ const DEFAULT_PROJECTS = [
     badges: [{l:'En ligne',c:'green'},{l:'GH Pages',c:'blue'},{l:'Firebase',c:'orange'}],
     description: "Ce tableau de bord lui-même. Vue consolidée des 14 projets, synchronisée en temps réel entre poste pro et téléphone via Firestore.",
     meta: [
-      ['Stack','HTML + CSS + JS vanilla + Firebase SDK v10 (CDN)'],
-      ['Stockage','Firestore europe-west9 (Paris)'],
-      ['Auth','Firebase Auth + whitelist rodolphemanes@gmail.com'],
-      ['Hébergement','GitHub Pages ridolf974.github.io/ecosysteme/'],
-      ['Coût','Gratuit']
+      {k:'Stack',v:'HTML + CSS + JS vanilla + Firebase SDK v10 (CDN)'},
+      {k:'Stockage',v:'Firestore europe-west9 (Paris)'},
+      {k:'Auth',v:'Firebase Auth + whitelist rodolphemanes@gmail.com'},
+      {k:'Hébergement',v:'GitHub Pages ridolf974.github.io/ecosysteme/'},
+      {k:'Coût',v:'Gratuit'}
     ],
     prochaineAction: "Revue mensuelle des prochaines actions · ajouter les nouveaux projets",
     keywords: "ecosysteme dashboard tableau bord 14 projets github pages firebase firestore auth"
@@ -779,7 +779,7 @@ const DEFAULT_PROJECTS = [
     url: 'https://ridolf974.github.io/ManAlert/',
     badges: [{l:'En ligne',c:'green'},{l:'GH Pages',c:'blue'},{l:'PAT',c:'orange'}],
     description: "Site statique d'alertes. PAT renouvelé récemment.",
-    meta: [['Action','Vérifier que le nouveau PAT est posé']],
+    meta: [{k:'Action',v:'Vérifier que le nouveau PAT est posé'}],
     prochaineAction: "Confirmer pose du nouveau PAT · noter date d'expiration",
     keywords: "manalert github pages pat token alertes statique"
   },
@@ -976,10 +976,10 @@ function renderCard(p) {
     ? `<a href="${esc(p.url)}" class="card-link card-url" target="_blank" rel="noopener">${esc(p.url.replace(/^https?:\/\//,''))}</a>`
     : '';
   const subHTML = p.sub ? `<span class="card-sub">${esc(p.sub)}</span>` : '';
-  const metaHTML = (p.meta || []).map(([k,v]) => `
+  const metaHTML = (p.meta || []).map(m => `
     <div class="meta-row">
-      <span class="meta-label">${esc(k)}</span>
-      <span class="meta-value">${esc(v)}</span>
+      <span class="meta-label">${esc(m.k)}</span>
+      <span class="meta-value">${esc(m.v)}</span>
     </div>`).join('') +
     `<div class="meta-row">
       <span class="meta-label">Priorité</span>
