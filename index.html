@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f5f1ea">
+<title>Écosystème — Rodolphe</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg-gradient-1: #f8f4ed;
+    --bg-gradient-2: #ede6d9;
+    --bg-card: #ffffff;
+    --bg-card-pink: #fce8ea;
+    --bg-card-lilac: #ebe6f5;
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --text-dim: #9a9a9a;
+    --border: #e5e1d6;
+    --accent: #E85D5D;
+    --accent-dark: #c94747;
+    --green: #d4ead4; --green-text: #2d5a2d;
+    --blue: #d6e4f5; --blue-text: #1e3a5f;
+    --purple: #e5d9f0; --purple-text: #4a2a6b;
+    --orange: #f7dfc4; --orange-text: #6b3a0f;
+    --red: #f5d0d0; --red-text: #6b1f1f;
+    --header-text: #3a2f4a;
+  }
+  html, body { overscroll-behavior-y: none; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+    background-attachment: fixed;
+    color: #2a2a2a;
+    padding: 24px 20px;
+    padding-bottom: 60px;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* Login screen */
+  #login-screen {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-box {
+    background: var(--bg-card);
+    padding: 36px 28px;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(80, 60, 100, 0.08);
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    border: 1px solid rgba(180, 160, 130, 0.12);
+  }
+  .login-box h2 {
+    color: var(--header-text);
+    font-size: 22px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .login-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+  .google-btn {
+    background: #fff;
+    border: 1px solid #dadce0;
+    color: #3c4043;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .google-btn:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-color: #b8bbbe; }
+  .google-btn svg { width: 18px; height: 18px; }
+  .login-error {
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: var(--red);
+    color: var(--red-text);
+    border-radius: 8px;
+    font-size: 13px;
+    display: none;
+  }
+  .login-error.show { display: block; }
+  .app-hidden { display: none !important; }
+
+  /* Header */
+  header {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .header-title { flex: 1; min-width: 200px; }
+  h1 {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--header-text);
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+  }
+  .subtitle { font-size: 14px; color: #6b5f75; }
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .user-avatar { width: 32px; height: 32px; border-radius: 50%; }
+  .sync-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4a9a4a;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .logout-btn {
+    background: transparent;
+    border: 1px solid rgba(180, 160, 130, 0.3);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .logout-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Stats bar */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .stat {
+    background: var(--bg-card);
+    padding: 12px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid rgba(180, 160, 130, 0.15);
+    box-shadow: 0 1px 3px rgba(80, 60, 100, 0.04);
+    user-select: none;
+  }
+  .stat:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(80, 60, 100, 0.08); }
+  .stat.active { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .stat-value { font-size: 24px; font-weight: 500; color: var(--header-text); }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .search {
+    flex: 1;
+    min-width: 180px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(180, 160, 130, 0.25);
+    color: #2a2a2a;
+    padding: 11px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .search:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(232, 93, 93, 0.1);
+  }
+  .filter-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(180, 160, 130, 0.25);
+    color: #6b5f75;
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: rgba(180, 160, 130, 0.5); color: #3a2f4a; background: rgba(255, 255, 255, 0.9); }
+  .filter-btn.active { background: var(--header-text); color: #fff; border-color: var(--header-text); }
+
+  /* Section */
+  .section { margin-bottom: 32px; }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: 13px;
+    color: #6b5f75;
+    padding-left: 10px;
+    border-left: 2px solid rgba(107, 95, 117, 0.4);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .section-title .count { color: #9a8ea0; font-weight: 400; margin-left: 6px; }
+  .add-btn {
+    background: transparent;
+    border: 1px dashed rgba(180, 160, 130, 0.5);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .add-btn:hover { border-style: solid; color: var(--accent); border-color: var(--accent); }
+
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .card {
+    background: var(--bg-card);
+    color: var(--text);
+    padding: 18px;
+    border-radius: 12px;
+    position: relative;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border: 1px solid rgba(180, 160, 130, 0.12);
+    box-shadow: 0 1px 3px rgba(80, 60, 100, 0.04);
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(80, 60, 100, 0.1); }
+  .card.pink { background: var(--bg-card-pink); }
+  .card.lilac { background: var(--bg-card-lilac); }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    flex: 1;
+    color: var(--header-text);
+    cursor: text;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    border-radius: 4px;
+  }
+  .card-title:focus { outline: 1px solid var(--accent); background: rgba(255,255,255,0.7); }
+
+  .card-delete {
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+  }
+  .card:hover .card-delete { opacity: 1; }
+  .card-delete:hover { color: var(--accent); background: rgba(232, 93, 93, 0.1); }
+
+  .card-url, .card-sub {
+    font-family: "SF Mono", Monaco, Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: block;
+    word-break: break-all;
+  }
+  a.card-link { color: var(--text-muted); text-decoration: none; }
+  a.card-link:hover { color: var(--accent); text-decoration: underline; }
+
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .badge.green { background: var(--green); color: var(--green-text); }
+  .badge.blue { background: var(--blue); color: var(--blue-text); }
+  .badge.purple { background: var(--purple); color: var(--purple-text); }
+  .badge.orange { background: var(--orange); color: var(--orange-text); }
+  .badge.red { background: var(--red); color: var(--red-text); }
+  .badge.gray { background: #e5e1d6; color: var(--text-muted); }
+
+  .card-desc {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text);
+    margin: 12px 0;
+    cursor: text;
+    padding: 4px;
+    margin-left: -4px;
+    margin-right: -4px;
+    border-radius: 4px;
+  }
+  .card-desc:focus { outline: 1px solid var(--accent); background: rgba(255,255,255,0.5); }
+
+  .card-meta {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .meta-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 8px;
+    margin-bottom: 4px;
+    align-items: start;
+  }
+  .meta-label { color: var(--text-muted); font-size: 12px; padding-top: 2px; }
+  .meta-value { color: var(--text); font-size: 13px; }
+  .meta-value.editable {
+    cursor: text;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    border-radius: 4px;
+  }
+  .meta-value.editable:focus { outline: 1px solid var(--accent); background: rgba(255,255,255,0.7); }
+
+  .priority-select {
+    font-family: inherit;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .next-action {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: rgba(232, 93, 93, 0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .next-action-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .next-action-text {
+    cursor: text;
+    padding: 2px;
+    margin: -2px;
+    border-radius: 3px;
+    outline: none;
+  }
+  .next-action-text:focus { background: rgba(255,255,255,0.8); }
+
+  .notes-area {
+    margin-top: 12px;
+    width: 100%;
+    min-height: 60px;
+    background: rgba(0,0,0,0.025);
+    border: 1px dashed #c5c1b6;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text);
+    resize: vertical;
+  }
+  .notes-area:focus {
+    outline: none;
+    border-style: solid;
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(232, 93, 93, 0.1);
+  }
+  .saved-indicator {
+    font-size: 11px;
+    color: var(--green-text);
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    height: 14px;
+  }
+  .saved-indicator.show { opacity: 1; }
+
+  /* Legend */
+  .legend {
+    background: var(--bg-card);
+    padding: 18px 22px;
+    border-radius: 12px;
+    margin-top: 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    border: 1px solid rgba(180, 160, 130, 0.12);
+  }
+  .legend-title { font-weight: 600; margin-bottom: 8px; color: var(--header-text); }
+  .legend strong { color: var(--header-text); }
+
+  .actions-bar { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+  .action-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(180, 160, 130, 0.25);
+    color: #6b5f75;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .action-btn:hover { border-color: rgba(180, 160, 130, 0.5); color: #3a2f4a; background: rgba(255, 255, 255, 0.95); }
+  .action-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .action-btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+
+  /* Migration banner */
+  .migration-banner {
+    background: linear-gradient(135deg, #ebe6f5, #fce8ea);
+    border: 1px solid rgba(180, 160, 130, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .migration-banner h3 { color: var(--header-text); margin-bottom: 8px; font-size: 18px; }
+  .migration-banner p { color: var(--text-muted); margin-bottom: 16px; font-size: 14px; }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(232, 93, 93, 0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hidden { display: none !important; }
+
+  /* Mobile */
+  @media (max-width: 900px) {
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .cards { grid-template-columns: 1fr; }
+    h1 { font-size: 22px; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 16px 12px; padding-bottom: 60px; }
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .stat-value { font-size: 20px; }
+    .stat { padding: 10px 12px; }
+    .card { padding: 16px; }
+    .card-delete { opacity: 1; }
+    .meta-row { grid-template-columns: 95px 1fr; gap: 6px; }
+    .meta-label { font-size: 11.5px; }
+    .toolbar { gap: 6px; }
+    .filter-btn { padding: 8px 12px; font-size: 12px; }
+    .user-info { font-size: 12px; }
+    .user-avatar { width: 28px; height: 28px; }
+  }
+
+  @media print {
+    body { background: white; color: black; padding: 20px; }
+    .toolbar, .actions-bar, .logout-btn, .card-delete, .add-btn, #login-screen { display: none !important; }
+    .card { break-inside: avoid; border: 1px solid #ccc; }
+    .stat { border: 1px solid #ccc; }
+    h1, .section-title { color: black; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="container">
+  <div class="login-box">
+    <h2>🌿 Votre écosystème</h2>
+    <p>Tableau de bord personnel de vos 14 projets.<br>Connectez-vous avec votre compte Google autorisé.</p>
+    <button class="google-btn" id="login-btn">
+      <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/>
+        <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+      </svg>
+      Se connecter avec Google
+    </button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- APP (hidden until login) -->
+<div id="app" class="container app-hidden">
+
+  <header>
+    <div class="header-title">
+      <h1>Votre écosystème — <span id="total-count">14</span> projets</h1>
+      <div class="subtitle">Synchronisé en temps réel · <span id="today-date"></span></div>
+    </div>
+    <div class="user-info">
+      <img src="" alt="" class="user-avatar" id="user-avatar">
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="sync-dot" title="Synchronisé"></span>
+          <span id="user-email"></span>
+        </div>
+      </div>
+      <button class="logout-btn" id="logout-btn">Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- Migration banner (shown only when no projects exist) -->
+  <div class="migration-banner hidden" id="migration-banner">
+    <h3>🚀 Premier lancement — importer vos 14 projets</h3>
+    <p>Votre base est vide. Cliquez ci-dessous pour importer automatiquement les 14 projets déjà documentés dans votre écosystème.</p>
+    <button class="action-btn primary" id="migrate-btn">📥 Importer mes 14 projets</button>
+  </div>
+
+  <div class="stats" id="stats-bar"></div>
+
+  <div class="toolbar">
+    <input type="text" class="search" id="search-input" placeholder="🔍 Rechercher (nom, techno, note...)">
+    <button class="filter-btn active" data-status="all">Tous</button>
+    <button class="filter-btn" data-status="actif">Actifs</button>
+    <button class="filter-btn" data-status="conception">Conception</button>
+    <button class="filter-btn" data-status="entrainement">Entraînement</button>
+  </div>
+
+  <div id="sections-container"></div>
+
+  <div class="legend">
+    <div class="legend-title">Clés de lecture</div>
+    <strong>Apps métier</strong> — vraies applications en production (FormaDia, RheoPlan).<br>
+    <strong>Éditorial</strong> — production quotidienne, pas une app.<br>
+    <strong>Automatisation</strong> — tourne seule, vérifier parfois les tokens.<br>
+    <strong>Skill</strong> — s'active automatiquement dans vos conversations Claude.<br>
+    <strong>Sites / apps</strong> — sites web et apps en conception ou entraînement.
+  </div>
+
+  <div class="actions-bar">
+    <button class="action-btn" onclick="window.print()">🖨️ Imprimer / PDF</button>
+    <button class="action-btn" id="export-btn">💾 Exporter tout (JSON)</button>
+    <button class="action-btn" id="new-project-btn">➕ Nouveau projet</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, setDoc, updateDoc, deleteDoc,
+  onSnapshot, writeBatch, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// =========================================================================
+// CONFIG
+// =========================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCPrBYEvP6DSqhnkhF3x10PZpu3cWXmXTY",
+  authDomain: "ecosysteme-rodolphe.firebaseapp.com",
+  projectId: "ecosysteme-rodolphe",
+  storageBucket: "ecosysteme-rodolphe.firebasestorage.app",
+  messagingSenderId: "271582931934",
+  appId: "1:271582931934:web:e2af789d001d0cc2594b4f"
+};
+const ALLOWED_EMAIL = "rodolphemanes@gmail.com";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// =========================================================================
+// LOGIN / AUTH
+// =========================================================================
+const loginScreen = document.getElementById('login-screen');
+const appDiv = document.getElementById('app');
+const loginBtn = document.getElementById('login-btn');
+const loginError = document.getElementById('login-error');
+const logoutBtn = document.getElementById('logout-btn');
+
+loginBtn.addEventListener('click', async () => {
+  loginError.classList.remove('show');
+  const provider = new GoogleAuthProvider();
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    loginError.textContent = 'Erreur : ' + e.message;
+    loginError.classList.add('show');
+  }
+});
+
+logoutBtn.addEventListener('click', () => signOut(auth));
+
+let currentUser = null;
+let unsubscribeProjects = null;
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    if (user.email !== ALLOWED_EMAIL) {
+      loginError.textContent = `Accès refusé : ${user.email} n'est pas autorisé.`;
+      loginError.classList.add('show');
+      signOut(auth);
+      return;
+    }
+    currentUser = user;
+    loginScreen.classList.add('app-hidden');
+    appDiv.classList.remove('app-hidden');
+    document.getElementById('user-email').textContent = user.email;
+    document.getElementById('user-avatar').src = user.photoURL || '';
+    setDateLabel();
+    subscribeToProjects();
+  } else {
+    currentUser = null;
+    if (unsubscribeProjects) unsubscribeProjects();
+    loginScreen.classList.remove('app-hidden');
+    appDiv.classList.add('app-hidden');
+  }
+});
+
+function setDateLabel() {
+  const d = new Date();
+  const jours = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  document.getElementById('today-date').textContent = `${jours[d.getDay()]} ${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// =========================================================================
+// DATA MODEL — 14 projets par défaut
+// =========================================================================
+const DEFAULT_PROJECTS = [
+  // Apps métier
+  { id: 'formadia', categorie: 'apps-metier', theme: 'lilac', ordre: 1, statut: 'actif', priorite: 'Haute',
+    titre: 'FormaDia',
+    url: 'https://formasodia-clinifutur.web.app',
+    badges: [{l:'Phase 2 ✅',c:'green'},{l:'Firebase Blaze',c:'orange'},{l:'SODIA',c:'purple'}],
+    description: "Gestion des formations annuelles Clinifutur (3 centres : DELPRA · OASIS · CJA). Kanban mensuel 3 colonnes, workflow d'inscription unifié (DEMANDE → INSCRIT + convocation PDF auto), suivi admin 11 statuts, exports CSV, 3 Cloud Functions planifiées.",
+    meta: [
+      ['Project ID','formasodia-clinifutur'],
+      ['Stack','Firebase Hosting + Firestore (asia-south1 Mumbai) + Functions (europe-west1) + Resend + jsPDF'],
+      ['Charte','Éditorial médical raffiné — Fraunces + Geist, violet SODIA #B088D9'],
+      ['Collections','7 : centres, utilisateurs, formations, sessions, stagiaires, inscriptions, suivi'],
+      ['Functions','rappelJ2 (8h) · attestationEvalChaud (9h) · evalFroid J+60 (10h)'],
+      ['Coût','0 € (Blaze sous seuils · Resend 3000/mois gratuit)'],
+      ['Phase','2 OK — 2bis (KPIs Analyses RH) à lancer']
+    ],
+    prochaineAction: "Lancer Phase 2bis — KPIs Analyses RH (absentéisme, remplissage, retour éval froid) · relancer DSI pour domaine expéditeur propre",
+    keywords: "formadia firebase clinifutur sodia formations delpra oasis cja cloud functions resend mumbai blaze"
+  },
+  { id: 'rheoplan', categorie: 'apps-metier', theme: 'white', ordre: 2, statut: 'actif', priorite: 'Moyenne',
+    titre: 'RheoPlan',
+    url: 'https://rheoplan.web.app',
+    badges: [{l:'Production',c:'green'},{l:'Privé',c:'gray'},{l:'Firebase',c:'blue'}],
+    description: "Outil interne de planification des séances de rhéophérèse pour le service de néphrologie. Gestion patients, cycles de soins, plannings, kits, personnel IDE. Évolution +87,5% séances.",
+    meta: [
+      ['Architecture','SPA monofichier — tout dans public/index.html (~4000 lignes, ES modules CDN, zéro build)'],
+      ['Stack','Firebase Hosting + Firestore + Auth (Google @clinifutur.net + whitelist) + Storage + Chart.js'],
+      ['Collections','7 : sessions, patients, cycles, kits, ide, agents, utilisateurs'],
+      ['Usage','Interne DELPRA — quotidien par le service'],
+      ['⚠ Sensible','doSilentSync() rate-limité 60s — ne JAMAIS ajouter de timer Firestore sans lui (pic 60k reads 15/04)']
+    ],
+    prochaineAction: "Surveiller la conso Firestore mensuelle · tester en local avant tout déploiement (app en prod quotidienne)",
+    keywords: "rheoplan rheopherese nephrologie delpra planification seances firestore chartjs patients cycles kits ide"
+  },
+  // Éditorial
+  { id: 'flashconnaissances', categorie: 'editorial', theme: 'pink', ordre: 1, statut: 'actif', priorite: 'Haute',
+    titre: 'Flashconnaissances',
+    url: '',
+    sub: 'TikTok éducatif quotidien — éphéméride en 7 slides',
+    badges: [{l:'Lancement',c:'red'},{l:'TikTok',c:'gray'},{l:'Daily 18h',c:'orange'}],
+    description: "Chaque jour, une date de l'Histoire devient une mini-énigme visuelle en 7 slides : hook → set-up → indice → révélation → chiffres → bonus insolite → CTA + teasing. Positionnement entre @minutehistoire et The Pudding.",
+    meta: [
+      ['Format','Carrousel 9:16 · 1080×1920 · 7 slides (non négociable)'],
+      ['Stack','React 18.3.1 UMD + Babel standalone (zéro build, HTML autonome)'],
+      ['Typos','Fraunces + Space Grotesk + Caveat'],
+      ['Signature','#E85D5D — UNIQUEMENT sur LE mot-clé pivot'],
+      ['Palettes','7 rotations : Sky · Rose · Sage · Sun · Terracotta · Lavande · Mint'],
+      ['KPIs algo','1. Completion ≥60% · 2. Saves ≥5% · 3. Reverse swipes (slide 3 → slide 5)'],
+      ['Objectifs An 1','5-10k abonnés · 365 jours sans rupture'],
+      ['Risque n°1','Ne pas lancer la newsletter dès mois 4-6 → 100% dépendant de TikTok']
+    ],
+    prochaineAction: "Tenir la chaîne des 90 jours · produire 14 jours d'avance · préparer le lancement newsletter dès mois 4",
+    keywords: "flashconnaissances tiktok ephemeride slides daily editorial rouge palette fraunces reverse swipe saves"
+  },
+  // Automatisations
+  { id: 'quittance-mezzacasa', categorie: 'automatisations', theme: 'white', ordre: 1, statut: 'actif', priorite: 'Basse',
+    titre: 'Quittance Sandrine MEZZACASA',
+    url: 'https://script.google.com',
+    badges: [{l:'Actif',c:'green'},{l:'Apps Script',c:'purple'}],
+    description: "PDF + Gmail le 3 de chaque mois à 8h. Studio Sainte-Clotilde.",
+    meta: [['Token','Non'],['Coût','Gratuit']],
+    prochaineAction: "Vérifier que l'envoi du 3 du mois passe bien",
+    keywords: "quittance sandrine mezzacasa loyer pdf gmail apps script sainte-clotilde"
+  },
+  { id: 'alerte-fiches-transfert', categorie: 'automatisations', theme: 'white', ordre: 2, statut: 'actif', priorite: 'Basse',
+    titre: 'Alerte fiches transfert',
+    url: 'https://script.google.com',
+    badges: [{l:'Actif',c:'green'},{l:'Apps Script',c:'purple'}],
+    description: "Mail aux équipes. 2ᵉ mardi 7h et 18h, 2ᵉ mercredi 7h.",
+    meta: [['Token','Non'],['Coût','Gratuit']],
+    prochaineAction: "RAS — laisser tourner",
+    keywords: "alerte fiches transfert mardi mercredi equipes apps script mail rappel"
+  },
+  { id: 'daily-news-report', categorie: 'automatisations', theme: 'white', ordre: 3, statut: 'actif', priorite: 'Moyenne',
+    titre: 'Daily News Report',
+    url: 'https://github.com/Ridolf974/daily-news-report',
+    badges: [{l:'Actif',c:'green'},{l:'GitHub',c:'blue'},{l:'Tokens',c:'red'}],
+    description: "30 actus chaque matin 8h. API Claude + web search.",
+    meta: [['Coût','~0,02 $/jour'],['Secrets','API Anthropic, Gmail app password']],
+    prochaineAction: "Surveiller la consommation de tokens mensuelle",
+    keywords: "daily news report github actions claude api anthropic web search tokens"
+  },
+  { id: 'gmao-delpra', categorie: 'automatisations', theme: 'white', ordre: 4, statut: 'actif', priorite: 'Moyenne',
+    titre: 'GMAO DELPRA',
+    url: '',
+    badges: [{l:'Déployé',c:'green'},{l:'Clinifutur',c:'gray'}],
+    description: "Outil groupe (pas votre dev). DELPRA site pilote depuis juin 2025.",
+    meta: [['Votre rôle','Pilote / supervision']],
+    prochaineAction: "Remonter retours d'usage pour déploiement autres centres",
+    keywords: "gmao delpra clinifutur outil groupe site pilote maintenance"
+  },
+  // Skills Claude
+  { id: 'skill-redaction-mail-pro', categorie: 'skills', theme: 'white', ordre: 1, statut: 'actif', priorite: 'Stable',
+    titre: 'redaction-mail-pro', url: '',
+    badges: [{l:'Installée',c:'green'},{l:'Skill',c:'blue'}],
+    description: "Rédaction mails pro français. Trois questions préalables systématiques (type, relation, ton).",
+    meta: [], prochaineAction: "",
+    keywords: "redaction mail pro francais questions vouvoiement professionnel"
+  },
+  { id: 'skill-analyse-cv-rh', categorie: 'skills', theme: 'white', ordre: 2, statut: 'actif', priorite: 'Stable',
+    titre: 'analyse-cv-rh', url: '',
+    badges: [{l:'Installée',c:'green'},{l:'Skill',c:'blue'}],
+    description: "Analyse candidatures santé. Fiche Word de synthèse.",
+    meta: [], prochaineAction: "",
+    keywords: "analyse cv rh sante candidature recrutement fiche word synthese"
+  },
+  { id: 'skill-better-prompt', categorie: 'skills', theme: 'white', ordre: 3, statut: 'actif', priorite: 'Stable',
+    titre: 'better-prompt', url: '',
+    badges: [{l:'Installée',c:'green'},{l:'Skill',c:'blue'}],
+    description: "Génère le meilleur prompt pour Claude. Sortie brute en anglais.",
+    meta: [], prochaineAction: "",
+    keywords: "better prompt anglais claude generation brute"
+  },
+  // Sites / apps
+  { id: 'ecosysteme-dashboard', categorie: 'sites', theme: 'lilac', ordre: 1, statut: 'actif', priorite: 'Moyenne',
+    titre: 'Écosystème Dashboard',
+    url: 'https://ridolf974.github.io/ecosysteme/',
+    badges: [{l:'En ligne',c:'green'},{l:'GH Pages',c:'blue'},{l:'Firebase',c:'orange'}],
+    description: "Ce tableau de bord lui-même. Vue consolidée des 14 projets, synchronisée en temps réel entre poste pro et téléphone via Firestore.",
+    meta: [
+      ['Stack','HTML + CSS + JS vanilla + Firebase SDK v10 (CDN)'],
+      ['Stockage','Firestore europe-west9 (Paris)'],
+      ['Auth','Firebase Auth + whitelist rodolphemanes@gmail.com'],
+      ['Hébergement','GitHub Pages ridolf974.github.io/ecosysteme/'],
+      ['Coût','Gratuit']
+    ],
+    prochaineAction: "Revue mensuelle des prochaines actions · ajouter les nouveaux projets",
+    keywords: "ecosysteme dashboard tableau bord 14 projets github pages firebase firestore auth"
+  },
+  { id: 'manalert', categorie: 'sites', theme: 'white', ordre: 2, statut: 'actif', priorite: 'Moyenne',
+    titre: 'ManAlert',
+    url: 'https://ridolf974.github.io/ManAlert/',
+    badges: [{l:'En ligne',c:'green'},{l:'GH Pages',c:'blue'},{l:'PAT',c:'orange'}],
+    description: "Site statique d'alertes. PAT renouvelé récemment.",
+    meta: [['Action','Vérifier que le nouveau PAT est posé']],
+    prochaineAction: "Confirmer pose du nouveau PAT · noter date d'expiration",
+    keywords: "manalert github pages pat token alertes statique"
+  },
+  { id: 'ebim', categorie: 'sites', theme: 'white', ordre: 3, statut: 'entrainement', priorite: 'Basse',
+    titre: 'eBIM Ingénierie',
+    url: 'https://ridolf974.github.io/Ebim',
+    badges: [{l:'Entraînement',c:'orange'},{l:'GH Pages',c:'blue'}],
+    description: "Site vitrine BIM fictif. Projet d'apprentissage.",
+    meta: [], prochaineAction: "",
+    keywords: "ebim ingenierie bim github pages vitrine apprentissage fictif"
+  },
+  { id: 'app-stock-mobilier', categorie: 'sites', theme: 'white', ordre: 4, statut: 'conception', priorite: 'Moyenne',
+    titre: 'App stock mobilier (femme)',
+    url: '',
+    badges: [{l:'Conception',c:'orange'},{l:'GitHub prévu',c:'blue'}],
+    description: "Gestion parc ~300 meubles. Brief validé, pas encore codé.",
+    meta: [], 
+    prochaineAction: "Démarrer le développement · choisir stack (GitHub Pages + JS ou Firebase)",
+    keywords: "app stock mobilier femme meubles retail logistique brief github"
+  }
+];
+
+const CATEGORIES = {
+  'apps-metier':    { label: 'Vos applications métier', short: 'Apps métier' },
+  'editorial':      { label: 'Projet éditorial',        short: 'Éditorial' },
+  'automatisations':{ label: 'Automatisations qui tournent', short: 'Automatisations' },
+  'skills':         { label: 'Skills Claude personnelles',   short: 'Skills Claude' },
+  'sites':          { label: 'Sites web et autres apps',     short: 'Sites / apps' }
+};
+
+// =========================================================================
+// FIRESTORE SUBSCRIBE
+// =========================================================================
+let projects = [];
+
+function subscribeToProjects() {
+  const uid = currentUser.uid;
+  const q = query(collection(db, 'users', uid, 'projets'));
+  unsubscribeProjects = onSnapshot(q, (snapshot) => {
+    projects = [];
+    snapshot.forEach(d => projects.push({ ...d.data(), id: d.id }));
+    projects.sort((a, b) => (a.ordre || 999) - (b.ordre || 999));
+
+    if (projects.length === 0) {
+      document.getElementById('migration-banner').classList.remove('hidden');
+      document.getElementById('sections-container').innerHTML = '';
+      renderStats();
+    } else {
+      document.getElementById('migration-banner').classList.add('hidden');
+      renderAll();
+    }
+  }, (err) => {
+    alert('Erreur Firestore: ' + err.message + '\n\nVérifiez les rules Firestore.');
+  });
+}
+
+// =========================================================================
+// MIGRATION
+// =========================================================================
+document.getElementById('migrate-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('migrate-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> Importation en cours...';
+  try {
+    const uid = currentUser.uid;
+    const batch = writeBatch(db);
+    for (const p of DEFAULT_PROJECTS) {
+      const ref = doc(db, 'users', uid, 'projets', p.id);
+      const data = { ...p, updatedAt: Date.now() };
+      delete data.id;
+      batch.set(ref, data);
+    }
+    await batch.commit();
+    btn.innerHTML = '✅ Importation réussie';
+  } catch (e) {
+    alert('Erreur: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '📥 Importer mes 14 projets';
+  }
+});
+
+// =========================================================================
+// SAVE (debounced)
+// =========================================================================
+const saveTimers = {};
+async function saveField(projectId, field, value, indicatorEl) {
+  clearTimeout(saveTimers[projectId + field]);
+  saveTimers[projectId + field] = setTimeout(async () => {
+    try {
+      const uid = currentUser.uid;
+      await updateDoc(doc(db, 'users', uid, 'projets', projectId), {
+        [field]: value,
+        updatedAt: Date.now()
+      });
+      if (indicatorEl) {
+        indicatorEl.classList.add('show');
+        setTimeout(() => indicatorEl.classList.remove('show'), 1200);
+      }
+    } catch (e) {
+      console.error('Save error:', e);
+    }
+  }, 500);
+}
+
+async function deleteProject(id) {
+  if (!confirm('Supprimer ce projet définitivement ?')) return;
+  try {
+    await deleteDoc(doc(db, 'users', currentUser.uid, 'projets', id));
+  } catch (e) {
+    alert('Erreur suppression: ' + e.message);
+  }
+}
+
+async function createNewProject() {
+  const titre = prompt('Titre du nouveau projet :');
+  if (!titre) return;
+  const id = 'proj-' + Date.now();
+  const newProject = {
+    categorie: 'sites', theme: 'white',
+    ordre: projects.length + 1, statut: 'conception', priorite: 'Moyenne',
+    titre, url: '',
+    badges: [{l:'Nouveau',c:'orange'}],
+    description: "Description du projet (cliquez pour éditer).",
+    meta: [], prochaineAction: "",
+    keywords: titre.toLowerCase(), updatedAt: Date.now()
+  };
+  try {
+    await setDoc(doc(db, 'users', currentUser.uid, 'projets', id), newProject);
+  } catch (e) {
+    alert('Erreur: ' + e.message);
+  }
+}
+document.getElementById('new-project-btn').addEventListener('click', createNewProject);
+
+// =========================================================================
+// RENDER
+// =========================================================================
+function renderStats() {
+  const bar = document.getElementById('stats-bar');
+  const counts = { all: projects.length };
+  for (const cat of Object.keys(CATEGORIES)) {
+    counts[cat] = projects.filter(p => p.categorie === cat).length;
+  }
+  bar.innerHTML = `
+    <div class="stat active" data-filter="all">
+      <div class="stat-label">Total</div><div class="stat-value">${counts.all}</div>
+    </div>
+    ${Object.entries(CATEGORIES).map(([key, c]) => `
+      <div class="stat" data-filter="${key}">
+        <div class="stat-label">${c.short}</div><div class="stat-value">${counts[key]}</div>
+      </div>`).join('')}
+  `;
+  bar.querySelectorAll('.stat').forEach(stat => {
+    stat.addEventListener('click', () => {
+      bar.querySelectorAll('.stat').forEach(s => s.classList.remove('active'));
+      stat.classList.add('active');
+      const filter = stat.dataset.filter;
+      document.querySelectorAll('.section').forEach(sec => {
+        sec.classList.toggle('hidden', filter !== 'all' && sec.dataset.category !== filter);
+      });
+    });
+  });
+  document.getElementById('total-count').textContent = counts.all;
+}
+
+function renderAll() {
+  renderStats();
+  const container = document.getElementById('sections-container');
+  container.innerHTML = '';
+  for (const [catKey, catData] of Object.entries(CATEGORIES)) {
+    const catProjects = projects.filter(p => p.categorie === catKey);
+    if (catProjects.length === 0) continue;
+    const section = document.createElement('div');
+    section.className = 'section';
+    section.dataset.category = catKey;
+    section.innerHTML = `
+      <div class="section-header">
+        <div class="section-title">${catData.label}<span class="count">(${catProjects.length})</span></div>
+      </div>
+      <div class="cards">${catProjects.map(renderCard).join('')}</div>
+    `;
+    container.appendChild(section);
+  }
+  attachCardListeners();
+  applyFilters();
+}
+
+function esc(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderCard(p) {
+  const themeCls = p.theme === 'pink' ? 'pink' : p.theme === 'lilac' ? 'lilac' : '';
+  const badgesHTML = (p.badges || []).map(b => `<span class="badge ${b.c||'gray'}">${esc(b.l)}</span>`).join('');
+  const urlHTML = p.url
+    ? `<a href="${esc(p.url)}" class="card-link card-url" target="_blank" rel="noopener">${esc(p.url.replace(/^https?:\/\//,''))}</a>`
+    : '';
+  const subHTML = p.sub ? `<span class="card-sub">${esc(p.sub)}</span>` : '';
+  const metaHTML = (p.meta || []).map(([k,v]) => `
+    <div class="meta-row">
+      <span class="meta-label">${esc(k)}</span>
+      <span class="meta-value">${esc(v)}</span>
+    </div>`).join('') +
+    `<div class="meta-row">
+      <span class="meta-label">Priorité</span>
+      <span class="meta-value">
+        <select class="priority-select badge ${priorityColor(p.priorite)}" data-project="${p.id}" data-field="priorite">
+          ${['Haute','Moyenne','Basse','Stable'].map(v =>
+            `<option value="${v}" ${p.priorite===v?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </span>
+    </div>`;
+  const actionHTML = p.prochaineAction
+    ? `<div class="next-action">
+         <div class="next-action-label">Prochaine action</div>
+         <div class="next-action-text" contenteditable="true" data-project="${p.id}" data-field="prochaineAction">${esc(p.prochaineAction)}</div>
+       </div>`
+    : `<div class="next-action" style="opacity:0.5">
+         <div class="next-action-label">Prochaine action</div>
+         <div class="next-action-text" contenteditable="true" data-project="${p.id}" data-field="prochaineAction">(cliquer pour ajouter)</div>
+       </div>`;
+
+  return `
+    <div class="card ${themeCls}" data-id="${p.id}" data-status="${p.statut}" data-keywords="${esc(p.keywords||'')}">
+      <div class="card-header">
+        <div class="card-title" contenteditable="true" data-project="${p.id}" data-field="titre">${esc(p.titre)}</div>
+        <button class="card-delete" data-delete="${p.id}" title="Supprimer">✕</button>
+      </div>
+      ${urlHTML}
+      ${subHTML}
+      <div class="badges">${badgesHTML}</div>
+      <div class="card-desc" contenteditable="true" data-project="${p.id}" data-field="description">${esc(p.description)}</div>
+      <div class="card-meta">${metaHTML}</div>
+      ${actionHTML}
+      <textarea class="notes-area" data-project="${p.id}" data-field="notes" placeholder="Vos notes personnelles...">${esc(p.notes||'')}</textarea>
+      <div class="saved-indicator">✓ Enregistré</div>
+    </div>
+  `;
+}
+
+function priorityColor(p) {
+  return { 'Haute':'red', 'Moyenne':'orange', 'Basse':'gray', 'Stable':'gray' }[p] || 'gray';
+}
+
+function attachCardListeners() {
+  // Édition contenteditable
+  document.querySelectorAll('[contenteditable="true"][data-field]').forEach(el => {
+    el.addEventListener('blur', () => {
+      const projectId = el.dataset.project;
+      const field = el.dataset.field;
+      const value = el.innerText.trim();
+      const indicator = el.closest('.card').querySelector('.saved-indicator');
+      saveField(projectId, field, value, indicator);
+    });
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey && !el.classList.contains('card-desc') && !el.classList.contains('next-action-text')) {
+        e.preventDefault();
+        el.blur();
+      }
+    });
+  });
+  // Notes textarea
+  document.querySelectorAll('.notes-area').forEach(el => {
+    el.addEventListener('input', () => {
+      const indicator = el.closest('.card').querySelector('.saved-indicator');
+      saveField(el.dataset.project, el.dataset.field, el.value, indicator);
+    });
+  });
+  // Priority select
+  document.querySelectorAll('.priority-select').forEach(el => {
+    el.addEventListener('change', () => {
+      el.className = 'priority-select badge ' + priorityColor(el.value);
+      saveField(el.dataset.project, el.dataset.field, el.value, el.closest('.card').querySelector('.saved-indicator'));
+    });
+  });
+  // Delete
+  document.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', () => deleteProject(btn.dataset.delete));
+  });
+}
+
+// =========================================================================
+// FILTERS
+// =========================================================================
+const searchInput = document.getElementById('search-input');
+const filterBtns = document.querySelectorAll('.filter-btn');
+let currentStatus = 'all';
+
+searchInput.addEventListener('input', applyFilters);
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentStatus = btn.dataset.status;
+    applyFilters();
+  });
+});
+
+function applyFilters() {
+  const q = searchInput.value.toLowerCase().trim();
+  document.querySelectorAll('.card').forEach(card => {
+    const matchStatus = currentStatus === 'all' || card.dataset.status === currentStatus;
+    const text = (card.textContent + ' ' + (card.dataset.keywords || '')).toLowerCase();
+    const matchSearch = !q || text.includes(q);
+    card.classList.toggle('hidden', !(matchStatus && matchSearch));
+  });
+}
+
+// =========================================================================
+// EXPORT
+// =========================================================================
+document.getElementById('export-btn').addEventListener('click', () => {
+  const out = {
+    exportedAt: new Date().toISOString(),
+    user: currentUser.email,
+    projects: projects
+  };
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ecosysteme-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+
+</body>
+</html>
