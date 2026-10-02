@@ -142,7 +142,7 @@
   /* Stats bar */
   .stats {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(7, 1fr);
     gap: 8px;
     margin-bottom: 24px;
   }
@@ -456,7 +456,7 @@
 
   /* Mobile */
   @media (max-width: 900px) {
-    .stats { grid-template-columns: repeat(3, 1fr); }
+    .stats { grid-template-columns: repeat(4, 1fr); }
     .cards { grid-template-columns: 1fr; }
     h1 { font-size: 22px; }
   }
@@ -490,7 +490,7 @@
 <div id="login-screen" class="container">
   <div class="login-box">
     <h2>🌿 Votre écosystème</h2>
-    <p>Tableau de bord personnel de vos 14 projets.<br>Connectez-vous avec votre compte Google autorisé.</p>
+    <p>Tableau de bord personnel de vos projets.<br>Connectez-vous avec votre compte Google autorisé.</p>
     <button class="google-btn" id="login-btn">
       <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
         <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
@@ -509,7 +509,7 @@
 
   <header>
     <div class="header-title">
-      <h1>Votre écosystème — <span id="total-count">14</span> projets</h1>
+      <h1>Votre écosystème — <span id="total-count">—</span> projets</h1>
       <div class="subtitle">Synchronisé en temps réel · <span id="today-date"></span></div>
     </div>
     <div class="user-info">
@@ -526,9 +526,19 @@
 
   <!-- Migration banner (shown only when no projects exist) -->
   <div class="migration-banner hidden" id="migration-banner">
-    <h3>🚀 Premier lancement — importer vos 14 projets</h3>
-    <p>Votre base est vide. Cliquez ci-dessous pour importer automatiquement les 14 projets déjà documentés dans votre écosystème.</p>
-    <button class="action-btn primary" id="migrate-btn">📥 Importer mes 14 projets</button>
+    <h3>🚀 Premier lancement — importer vos projets</h3>
+    <p>Votre base est vide. Cliquez ci-dessous pour importer automatiquement les projets déjà documentés dans votre écosystème.</p>
+    <button class="action-btn primary" id="migrate-btn">📥 Importer mes projets</button>
+  </div>
+
+  <!-- Catalogue banner (shown when DEFAULT_PROJECTS has new or updated entries) -->
+  <div class="migration-banner hidden" id="catalogue-banner">
+    <h3>✨ Nouveautés dans votre écosystème</h3>
+    <p id="catalogue-list"></p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="action-btn primary" id="catalogue-apply-btn">✅ Appliquer</button>
+      <button class="action-btn" id="catalogue-ignore-btn">Ignorer</button>
+    </div>
   </div>
 
   <div class="stats" id="stats-bar"></div>
@@ -546,6 +556,7 @@
   <div class="legend">
     <div class="legend-title">Clés de lecture</div>
     <strong>Apps métier</strong> — vraies applications en production (FormaDia, RheoPlan).<br>
+    <strong>Apps perso</strong> — outils pour vous et votre foyer (Pilotage logement, Jarvis).<br>
     <strong>Éditorial</strong> — production quotidienne, pas une app.<br>
     <strong>Automatisation</strong> — tourne seule, vérifier parfois les tokens.<br>
     <strong>Skill</strong> — s'active automatiquement dans vos conversations Claude.<br>
@@ -643,7 +654,10 @@ function setDateLabel() {
 }
 
 // =========================================================================
-// DATA MODEL — 14 projets par défaut
+// DATA MODEL — projets par défaut
+// `v` : version de la fiche. Quand on ajoute un projet ou qu'on modifie une
+// fiche ici, mettre v au-dessus de la valeur déjà en base (absente = 1) :
+// le bandeau « catalogue » proposera alors de l'ajouter / la mettre à jour.
 // =========================================================================
 const DEFAULT_PROJECTS = [
   // Apps métier
@@ -759,11 +773,11 @@ const DEFAULT_PROJECTS = [
     keywords: "better prompt anglais claude generation brute"
   },
   // Sites / apps
-  { id: 'ecosysteme-dashboard', categorie: 'sites', theme: 'lilac', ordre: 1, statut: 'actif', priorite: 'Moyenne',
+  { id: 'ecosysteme-dashboard', categorie: 'sites', theme: 'lilac', ordre: 1, statut: 'actif', priorite: 'Moyenne', v: 2,
     titre: 'Écosystème Dashboard',
     url: 'https://ridolf974.github.io/ecosysteme/',
     badges: [{l:'En ligne',c:'green'},{l:'GH Pages',c:'blue'},{l:'Firebase',c:'orange'}],
-    description: "Ce tableau de bord lui-même. Vue consolidée des 14 projets, synchronisée en temps réel entre poste pro et téléphone via Firestore.",
+    description: "Ce tableau de bord lui-même. Vue consolidée de tous les projets, synchronisée en temps réel entre poste pro et téléphone via Firestore.",
     meta: [
       {k:'Stack',v:'HTML + CSS + JS vanilla + Firebase SDK v10 (CDN)'},
       {k:'Stockage',v:'Firestore europe-west9 (Paris)'},
@@ -772,7 +786,7 @@ const DEFAULT_PROJECTS = [
       {k:'Coût',v:'Gratuit'}
     ],
     prochaineAction: "Revue mensuelle des prochaines actions · ajouter les nouveaux projets",
-    keywords: "ecosysteme dashboard tableau bord 14 projets github pages firebase firestore auth"
+    keywords: "ecosysteme dashboard tableau bord projets github pages firebase firestore auth"
   },
   { id: 'manalert', categorie: 'sites', theme: 'white', ordre: 2, statut: 'actif', priorite: 'Moyenne',
     titre: 'ManAlert',
@@ -791,19 +805,85 @@ const DEFAULT_PROJECTS = [
     meta: [], prochaineAction: "",
     keywords: "ebim ingenierie bim github pages vitrine apprentissage fictif"
   },
-  { id: 'app-stock-mobilier', categorie: 'sites', theme: 'white', ordre: 4, statut: 'conception', priorite: 'Moyenne',
-    titre: 'App stock mobilier (femme)',
-    url: '',
-    badges: [{l:'Conception',c:'orange'},{l:'GitHub prévu',c:'blue'}],
-    description: "Gestion parc ~300 meubles. Brief validé, pas encore codé.",
-    meta: [], 
-    prochaineAction: "Démarrer le développement · choisir stack (GitHub Pages + JS ou Firebase)",
-    keywords: "app stock mobilier femme meubles retail logistique brief github"
+  { id: 'app-stock-mobilier', categorie: 'sites', theme: 'white', ordre: 4, statut: 'conception', priorite: 'Moyenne', v: 2,
+    titre: 'BC Mobilier (Cosmemeuble)',
+    url: 'https://github.com/Ridolf974/Cosmemeuble',
+    badges: [{l:'Conception',c:'orange'},{l:'Django',c:'blue'},{l:'Cahier des charges ✅',c:'green'}],
+    description: "Gestion du parc de ~300 meubles de présentation de Bourbon Conseil (mis à disposition des commerciaux Cosmé Belle et Sodibelle) : stock en temps réel, localisation, commandes soumises à validation, suivi des récupérations, alertes email.",
+    meta: [
+      {k:'Stack validée',v:'Python + Django · PostgreSQL · templates + HTMX · Docker'},
+      {k:'Rôles',v:'2 administratrices · agents agence · ~10 commerciaux'},
+      {k:'Alertes',v:'Récupération J-1 · récupération échouée · nouvelle commande · stock bas'},
+      {k:'Hébergement',v:'À prévoir (~5 €/mois VPS)'},
+      {k:'État',v:'Cahier des charges dans CLAUDE.md — pas encore de code'}
+    ],
+    prochaineAction: "Valider le modèle de données puis démarrer le développement Django · choisir l'hébergement",
+    keywords: "bc mobilier cosmemeuble bourbon conseil cosme belle sodibelle stock meubles django postgresql htmx docker femme"
+  },
+  { id: 'trp-site', categorie: 'sites', theme: 'white', ordre: 5, statut: 'actif', priorite: 'Haute', v: 2,
+    titre: 'Tennis Réunion Performance',
+    url: 'https://tennis-reunion-performance.netlify.app',
+    badges: [{l:'En ligne',c:'green'},{l:'Netlify',c:'blue'},{l:'Airtable',c:'purple'}],
+    description: "Site du club TRP (Sainte-Marie) : vitrine, inscriptions école de tennis / stages / mercredi jeunesse, dashboard président protégé (filtres, export Excel, suppression). Destiné à être transmis au club.",
+    meta: [
+      {k:'Stack',v:'Eleventy (HTML statique) + Netlify Functions + Airtable'},
+      {k:'Déploiement',v:'Auto sur git push (repo privé trp-site, branche master)'},
+      {k:'Stages',v:"Ouverture pilotée par la case « Ouvert » dans Airtable (cache 5 min)"},
+      {k:'⚠ Vigilance',v:"Échec de déploiement « credit usage exceeded » = compte Netlify, pas le code"},
+      {k:'Coût',v:'Paliers gratuits Netlify + Airtable'}
+    ],
+    prochaineAction: "Activer le DPA Airtable · paiement en ligne (phase 2) · préparer la passation au président",
+    keywords: "trp tennis reunion performance club sainte-marie netlify airtable eleventy inscriptions stages president dashboard"
+  },
+  { id: 'naia', categorie: 'sites', theme: 'white', ordre: 6, statut: 'actif', priorite: 'Basse', v: 2,
+    titre: 'Naïa',
+    url: 'https://ridolf974.github.io/naia/',
+    badges: [{l:'En ligne',c:'green'},{l:'GH Pages',c:'blue'},{l:'Tokens',c:'red'}],
+    description: "Assistante IA conversationnelle qui qualifie les prospects avant rendez-vous : questionnaire guidé avec réactions personnalisées générées par Claude.",
+    meta: [
+      {k:'Stack',v:'React (CDN) sur GitHub Pages + Cloud Function europe-west1 (proxy API Anthropic)'},
+      {k:'Modèle',v:'Claude Haiku 4.5'},
+      {k:'Déploiement',v:'GitHub Actions sur push (secrets GCP_SA_KEY + ANTHROPIC_API_KEY)'},
+      {k:'Coût',v:'~1 €/mois pour ~50 prospects'}
+    ],
+    prochaineAction: "Vérifier que la Cloud Function répond (sinon réponses génériques « Bien noté 👌 ») · surveiller les crédits API",
+    keywords: "naia assistante ia prospects questionnaire claude haiku cloud function github pages anthropic"
+  },
+  // Apps perso
+  { id: 'pilotage-logement', categorie: 'apps-perso', theme: 'lilac', ordre: 1, statut: 'actif', priorite: 'Haute', v: 2,
+    titre: 'Pilotage logement',
+    url: 'https://pilotage-logement-manes.web.app',
+    badges: [{l:'Production',c:'green'},{l:'Privé',c:'gray'},{l:'Firebase',c:'blue'}],
+    description: "Dashboard de pilotage du patrimoine locatif (2 biens à La Réunion, LMNP) : 9 onglets — Aperçu, biens, Pilotage, Fiscalité, Échéances, Contacts, Journal, Documents.",
+    meta: [
+      {k:'Stack',v:'Firebase Hosting + Auth (Google + lien email) + Firestore'},
+      {k:'Sécurité',v:'Coque publique vide — contenu chargé depuis Firestore après connexion'},
+      {k:'CI/CD',v:'GitHub Actions sur push main → publish-panels + firebase deploy'},
+      {k:'Automatisation',v:'Apps Script sync-drive (7h) → détecte les nouveaux fichiers Drive · /sync-drive'},
+      {k:'Compta',v:'LMNP via Indy (depuis 05/2026)'}
+    ],
+    prochaineAction: "Mise à jour mensuelle (prélèvements Citya, échéances) · traiter les nouveaux fichiers Drive via /sync-drive",
+    keywords: "pilotage logement patrimoine immobilier lmnp indy citya firebase drive sync locatif reunion"
+  },
+  { id: 'jarvis', categorie: 'apps-perso', theme: 'white', ordre: 2, statut: 'conception', priorite: 'Moyenne', v: 2,
+    titre: 'Jarvis',
+    url: 'https://github.com/Ridolf974/Jarvis',
+    badges: [{l:'Build ✅',c:'green'},{l:'139 tests',c:'blue'},{l:'Non branché',c:'orange'}],
+    description: "Assistant personnel vocal façon majordome : tri et résumé des mails (garde-fous de confirmation, corbeille uniquement, journal d'audit), lumières Hue, mémoire Obsidian, génération d'images et de présentations, briefing actus, veille immobilière.",
+    meta: [
+      {k:'Stack',v:'Monorepo TypeScript/Node — server (Vercel) + home-agent (maison) + shared'},
+      {k:'Fournisseurs',v:'Anthropic, OpenAI, Inworld (TTS), Gmail, Hue, Gamma, Obsidian'},
+      {k:'État',v:'18/18 critères GOAL.md validés sur mocks — connexions réelles à faire (SETUP.md)'},
+      {k:'Interface',v:'PWA avec authentification, wake-word'}
+    ],
+    prochaineAction: "Brancher les vrais identifiants en suivant SETUP.md · déployer le serveur sur Vercel · installer le home-agent",
+    keywords: "jarvis assistant personnel vocal majordome mail gmail hue obsidian vercel typescript pwa"
   }
 ];
 
 const CATEGORIES = {
   'apps-metier':    { label: 'Vos applications métier', short: 'Apps métier' },
+  'apps-perso':     { label: 'Applications personnelles', short: 'Apps perso' },
   'editorial':      { label: 'Projet éditorial',        short: 'Éditorial' },
   'automatisations':{ label: 'Automatisations qui tournent', short: 'Automatisations' },
   'skills':         { label: 'Skills Claude personnelles',   short: 'Skills Claude' },
@@ -825,10 +905,12 @@ function subscribeToProjects() {
 
     if (projects.length === 0) {
       document.getElementById('migration-banner').classList.remove('hidden');
+      document.getElementById('catalogue-banner').classList.add('hidden');
       document.getElementById('sections-container').innerHTML = '';
       renderStats();
     } else {
       document.getElementById('migration-banner').classList.add('hidden');
+      renderCatalogueBanner();
       renderAll();
     }
   }, (err) => {
@@ -857,8 +939,79 @@ document.getElementById('migrate-btn').addEventListener('click', async () => {
   } catch (e) {
     alert('Erreur: ' + e.message);
     btn.disabled = false;
-    btn.innerHTML = '📥 Importer mes 14 projets';
+    btn.innerHTML = `📥 Importer mes ${DEFAULT_PROJECTS.length} projets`;
   }
+});
+
+// =========================================================================
+// CATALOGUE — nouveaux projets / fiches mises à jour depuis DEFAULT_PROJECTS
+// =========================================================================
+// Les choix « Ignorer » sont mémorisés par appareil (clé id@version).
+const IGNORED_KEY = 'ecosysteme-catalogue-ignore';
+function readIgnored() {
+  try { return JSON.parse(localStorage.getItem(IGNORED_KEY) || '[]'); } catch (e) { return []; }
+}
+function writeIgnored(list) {
+  try { localStorage.setItem(IGNORED_KEY, JSON.stringify(list)); } catch (e) {}
+}
+const catalogueKey = (d) => d.id + '@' + (d.v || 1);
+
+function computeCatalogueChanges() {
+  const byId = new Map(projects.map(p => [p.id, p]));
+  const ignored = readIgnored();
+  const added = [], updated = [];
+  for (const d of DEFAULT_PROJECTS) {
+    if (ignored.includes(catalogueKey(d))) continue;
+    const cur = byId.get(d.id);
+    if (!cur) added.push(d);
+    else if ((d.v || 1) > (cur.v || 1)) updated.push(d);
+  }
+  return { added, updated };
+}
+
+let pendingCatalogue = { added: [], updated: [] };
+function renderCatalogueBanner() {
+  pendingCatalogue = computeCatalogueChanges();
+  const { added, updated } = pendingCatalogue;
+  const banner = document.getElementById('catalogue-banner');
+  if (added.length + updated.length === 0) { banner.classList.add('hidden'); return; }
+  const parts = [];
+  if (added.length) parts.push(`<strong>À ajouter :</strong> ${added.map(d => esc(d.titre)).join(', ')}`);
+  if (updated.length) parts.push(`<strong>Fiches mises à jour :</strong> ${updated.map(d => esc(d.titre)).join(', ')}`);
+  document.getElementById('catalogue-list').innerHTML = parts.join('<br>') +
+    (updated.length ? '<br><em>Vos notes et priorités sont conservées.</em>' : '');
+  banner.classList.remove('hidden');
+}
+
+document.getElementById('catalogue-apply-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('catalogue-apply-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span> Mise à jour...';
+  try {
+    const uid = currentUser.uid;
+    const batch = writeBatch(db);
+    for (const d of pendingCatalogue.added) {
+      const data = { ...d, updatedAt: Date.now() };
+      delete data.id;
+      batch.set(doc(db, 'users', uid, 'projets', d.id), data);
+    }
+    for (const d of pendingCatalogue.updated) {
+      const data = { ...d, updatedAt: Date.now() };
+      delete data.id; delete data.notes; delete data.priorite;
+      batch.set(doc(db, 'users', uid, 'projets', d.id), data, { merge: true });
+    }
+    await batch.commit();
+  } catch (e) {
+    alert('Erreur: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '✅ Appliquer';
+});
+
+document.getElementById('catalogue-ignore-btn').addEventListener('click', () => {
+  const { added, updated } = pendingCatalogue;
+  writeIgnored([...new Set([...readIgnored(), ...added.map(catalogueKey), ...updated.map(catalogueKey)])]);
+  renderCatalogueBanner();
 });
 
 // =========================================================================
